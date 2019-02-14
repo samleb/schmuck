@@ -18,7 +18,7 @@ module Schmuck
   end
 
   @@cache = {}
-  @@cache_max = 2000
+  @@cache_max = 10_000
 end
 
 class String

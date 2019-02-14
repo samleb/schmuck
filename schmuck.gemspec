@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "schmuck"
   spec.version       = Schmuck::VERSION
   spec.authors       = ["Samuel Lebeau"]
-  spec.email         = ["samuel.lebeau@lunc.hr"]
+  spec.email         = ["samuel.lebeau@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Write a short summary, because Rubygems requires one.}
+  spec.description   = %q{Write a longer description or delete this line.}
+  spec.homepage      = "https://github.com/samleb/schmuck"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

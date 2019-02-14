@@ -99,7 +99,7 @@ module Schmuck
     end
 
     def to_proc
-      method(:apply).to_proc
+      -> (receiver) { apply(receiver) }
     end
   end
 end
