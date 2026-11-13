@@ -168,6 +168,38 @@ response.then(&'[data][repository][issues][edges]*([node][labels][edges]*([node]
 # => ["parser", "good first issue", "docs"]
 ```
 
+## What sets schmuck apart from other JSON query languages
+
+Here are the unique SKUs of the [REST example](#a-paginated-rest-response) in
+the best-known JSON query languages:
+
+| Language | Query                                                  |
+|----------|--------------------------------------------------------|
+| Schmuck  | `[data]*([items]*[sku]).flatten.uniq`                  |
+| jq       | `[.data[].items[].sku] \| unique`                      |
+| JSONPath | `$.data[*].items[*].sku` (no way to remove duplicates) |
+| JMESPath | `data[].items[].sku` (no way to remove duplicates)     |
+| JSONata  | `$distinct(data.items.sku)`                            |
+
+- **It's plain Ruby.** A path is a block, so it works with `map`, `select`,
+  `sort_by`, `then` or any other method that takes one. It runs on the objects
+  you already have and returns Ruby objects: there is no JSON to serialize and
+  parse again, and no native library to install (Ruby gems for jq wrap its C
+  library).
+- **Any Ruby method can appear in a path.** `.flatten.uniq`, `.sum` or
+  `."any?"` replace the fixed set of functions that query languages provide.
+- **Nested arrays keep their structure** until you call `.flatten`, while jq,
+  JSONPath and JSONata flatten results automatically.
+- **It's strict by default.** Accessing anything on `nil` raises unless you
+  write `?`, where query languages usually return nothing.
+- **The syntax feels familiar.** It extends Ruby's `Symbol#to_proc`
+  (`map(&:name)`) to strings, and borrows Groovy's spread operator (`*.`) and
+  JavaScript's optional chaining (`?.`).
+
+The trade-off is that a path is a string parsed at runtime (and cached), so a
+mistake in it only shows up when that code runs, and editors can't check or
+autocomplete it.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
