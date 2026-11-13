@@ -1,36 +1,34 @@
-# coding: utf-8
-lib = File.expand_path("../lib", __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "schmuck/version"
+# frozen_string_literal: true
+
+require_relative "lib/schmuck/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "schmuck"
-  spec.version       = Schmuck::VERSION
-  spec.authors       = ["Samuel Lebeau"]
-  spec.email         = ["samuel.lebeau@gmail.com"]
+  spec.name = "schmuck"
+  spec.version = Schmuck::VERSION
+  spec.authors = ["Samuel Lebeau"]
+  spec.email = ["samuel.lebeau@less-software.sh"]
 
-  spec.summary       = %q{Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{Write a longer description or delete this line.}
-  spec.homepage      = "https://github.com/samleb/schmuck"
-  spec.license       = "MIT"
+  spec.summary = "Readable paths through nested hashes and arrays, usable as blocks."
+  spec.description = <<~DESCRIPTION
+    Schmuck adds String#to_proc so that a path like '[data]*([items]*[sku])' can be
+    passed as a block to traverse parsed JSON and other nested structures.
+  DESCRIPTION
+  spec.homepage = "https://github.com/samleb/schmuck"
+  spec.license = "MIT"
+  spec.required_ruby_version = ">= 3.2.0"
 
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against " \
-      "public gem pushes."
+  spec.metadata["allowed_push_host"] = "https://rubygems.org"
+  spec.metadata["source_code_uri"] = spec.homepage
+  spec.metadata["rubygems_mfa_required"] = "true"
+
+  # Specify which files should be added to the gem when it is released.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  gemspec = File.basename(__FILE__)
+  spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
+    ls.readlines("\x0", chomp: true).reject do |f|
+      (f == gemspec) ||
+        f.start_with?(*%w[bin/ Gemfile .gitignore .rspec spec/ .github/])
+    end
   end
-
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-
-  spec.add_development_dependency "bundler", "~> 1.15"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
 end

@@ -1,6 +1,8 @@
-require 'schmuck/version'
-require 'schmuck/lexer'
-require 'schmuck/path'
+# frozen_string_literal: true
+
+require_relative "schmuck/version"
+require_relative "schmuck/parser"
+require_relative "schmuck/path"
 
 module Schmuck
   def self.cache(string)

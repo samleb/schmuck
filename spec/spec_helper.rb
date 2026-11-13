@@ -1,4 +1,5 @@
-require "bundler/setup"
+# frozen_string_literal: true
+
 require "schmuck"
 
 RSpec.configure do |config|
