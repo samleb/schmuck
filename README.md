@@ -116,10 +116,10 @@ pull_requests.map { |pr| pr["head"]["repo"]&.fetch("full_name") }
 Schmuck:
 
 ```ruby
-pull_requests.then(&'*([user][login])')            # => ["octocat", "hubot"]
-pull_requests.then(&'*([labels]*[name])')          # => [["enhancement", "parser"], []]
-pull_requests.then(&'*[draft]."any?"')             # => true
-pull_requests.then(&'*([head][repo]?[full_name])') # => ["octocat/schmuck", nil]
+pull_requests.map(&'[user][login]')            # => ["octocat", "hubot"]
+pull_requests.map(&'[labels]*[name]')          # => [["enhancement", "parser"], []]
+pull_requests.then(&'*[draft]."any?"')         # => true
+pull_requests.map(&'[head][repo]?[full_name]') # => ["octocat/schmuck", nil]
 ```
 
 ### A deeply nested GraphQL response
