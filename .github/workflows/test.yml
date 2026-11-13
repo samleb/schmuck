@@ -2,6 +2,9 @@ name: Test
 
 on: pull_request
 
+permissions:
+  contents: read
+
 jobs:
   rspec:
     runs-on: ubuntu-latest
@@ -10,6 +13,8 @@ jobs:
         ruby: ["3.4", "4.0"]
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
