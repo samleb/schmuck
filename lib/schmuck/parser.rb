@@ -2,8 +2,8 @@ require "strscan"
 
 module Schmuck
   class Parser
-    Accessor  = Data.define(:type, :key, :mandatory)
-    Aggregate = Data.define(:expressions, :mandatory)
+    Accessor  = Data.define(:type, :key, :optional)
+    Aggregate = Data.define(:expressions, :optional)
 
     class ParseError < StandardError; end
 
@@ -22,10 +22,10 @@ module Schmuck
 
     private
 
-    # expression := '!'? ( '*' aggregated | accessor )
+    # expression := '?'? ( '*' aggregated | accessor )
     def expression
-      mandatory = !@s.skip("!").nil?
-      @s.skip("*") ? Aggregate.new(aggregated, mandatory) : accessor(mandatory)
+      optional = !@s.skip("?").nil?
+      @s.skip("*") ? Aggregate.new(aggregated, optional) : accessor(optional)
     end
 
     # aggregated := '(' expression+ ')' | expression
@@ -38,13 +38,13 @@ module Schmuck
     end
 
     # accessor := '.' word | '[' bracket ']'
-    def accessor(mandatory)
+    def accessor(optional)
       type, key =
         if    @s.skip(".") then [:method, word]
         elsif @s.skip("[") then bracket.tap { expect("]") }
         else  raise error("expected '.', '[' or '*'")
         end
-      Accessor.new(type, key, mandatory)
+      Accessor.new(type, key, optional)
     end
 
     # bracket := ':' word | quote word quote | digits | word

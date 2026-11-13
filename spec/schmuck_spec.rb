@@ -38,4 +38,10 @@ RSpec.describe Schmuck do
       response.then(&'[results]*([weights][0]*.succ)')
     ).to eq([[1, 2, 3], [4, 5, 6]])
   end
+
+  it "fails on nil unless the accessor is optional" do
+    expect({ a: nil }.then(&'[a]?.b')).to be_nil
+    expect { { a: nil }.then(&'[a].b') }.to raise_error(NoMethodError)
+    expect { { a: nil }.then(&'[a]*.b') }.to raise_error(ArgumentError, "object isn't optional")
+  end
 end

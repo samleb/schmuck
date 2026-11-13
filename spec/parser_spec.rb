@@ -1,8 +1,8 @@
 require_relative "spec_helper"
 
 RSpec.describe Schmuck::Parser do
-  def acc(type, key, mandatory: false) = described_class::Accessor.new(type, key, mandatory)
-  def agg(*accessors, mandatory: false) = described_class::Aggregate.new(accessors, mandatory)
+  def acc(type, key, optional: false) = described_class::Accessor.new(type, key, optional)
+  def agg(*accessors, optional: false) = described_class::Aggregate.new(accessors, optional)
 
   subject(:parsed) { described_class.parse(source) }
 
@@ -24,10 +24,16 @@ RSpec.describe Schmuck::Parser do
     end
   end
 
-  context "with ! in front of any accessor" do
-    let(:source) { "!.a![0]" }
+  context "with ? in front of any accessor" do
+    let(:source) { "?.a?[0]?*.b" }
 
-    it { is_expected.to eq [acc(:method, "a", mandatory: true), acc(:index, 0, mandatory: true)] }
+    it do
+      is_expected.to eq [
+        acc(:method, "a", optional: true),
+        acc(:index, 0, optional: true),
+        agg(acc(:method, "b"), optional: true),
+      ]
+    end
   end
 
   context "with a chain" do
@@ -43,11 +49,11 @@ RSpec.describe Schmuck::Parser do
   end
 
   context "with a grouped aggregate" do
-    let(:source) { "*(.address![:city])[0]" }
+    let(:source) { "*(.address?[:city])[0]" }
 
     it do
       is_expected.to eq [
-        agg(acc(:method, "address"), acc(:symbol, :city, mandatory: true)),
+        agg(acc(:method, "address"), acc(:symbol, :city, optional: true)),
         acc(:index, 0),
       ]
     end
@@ -86,7 +92,7 @@ RSpec.describe Schmuck::Parser do
       "['foo\"]" => %q(expected "'"),
       "*()"      => "expected '.', '[' or '*'",
       "*(.a"     => "expected '.', '[' or '*'",
-      "!!.a"     => "expected '.', '[' or '*'",
+      "??.a"     => "expected '.', '[' or '*'",
       "*(*(.a)"  => "expected '.', '[' or '*'",   # unclosed inner group
     }.each do |src, message|
       context "with #{src.inspect}" do

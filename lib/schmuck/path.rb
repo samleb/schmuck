@@ -2,7 +2,7 @@ module Schmuck
   class Path
     class AccessorPart
       attr_reader :key
-      attr_accessor :mandatory
+      attr_accessor :optional
 
       def initialize(key)
         @key = key
@@ -67,7 +67,7 @@ module Schmuck
     end
 
     class AggregatePart
-      attr_accessor :mandatory
+      attr_accessor :optional
 
       def initialize(path)
         @path = path
@@ -103,11 +103,11 @@ module Schmuck
         case expression
         when Parser::Aggregate
           AggregatePart.new(construct(expression.expressions)).tap do |part|
-            part.mandatory = expression.mandatory
+            part.optional = expression.optional
           end
         when Parser::Accessor
           ACCESSOR_PART_TYPES[expression.type].new(expression.key).tap do |part|
-            part.mandatory = expression.mandatory
+            part.optional = expression.optional
           end
         end
       end
@@ -120,11 +120,7 @@ module Schmuck
 
     def apply(object)
       @parts.inject(object) do |object, part|
-        if part.mandatory
-          part.apply(object)
-        else
-          part.apply(object) if object !=  nil
-        end
+        part.apply(object) unless part.optional && object.nil?
       end
     end
 
