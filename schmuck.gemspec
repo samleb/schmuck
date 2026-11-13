@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name = "schmuck"
   spec.version = Schmuck::VERSION
   spec.authors = ["Samuel Lebeau"]
-  spec.email = ["samuel.lebeau@gmail.com"]
+  spec.email = ["samuel.lebeau@less-software.sh"]
 
   spec.summary = "Readable paths through nested hashes and arrays, usable as blocks."
   spec.description = <<~DESCRIPTION
