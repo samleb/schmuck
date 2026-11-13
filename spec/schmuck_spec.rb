@@ -17,9 +17,25 @@ RSpec.describe Schmuck do
     end
   }
 
-  it "does something useful" do
+  it "handles complex cases" do
+    response = { results: hashes }
+    
+    output = response.then(&'[results]*([multiples][2]).max')
+    expect(output).to eq(20)
+    
+    output = response.then(&'[results].first[:integer]')
+    expect(output).to eq(1)
+
+    expect(hashes.then(&'*([multiples][1]).max')).to eq(15)
+
+    response = {
+      results: [
+        { weights: [ [0, 1, 2], [1, 2, 3], [2, 3, 4] ] },
+        { weights: [ [3, 4, 5], [4, 5, 6], [5, 6, 7] ] },
+      ]
+    }
     expect(
-      hashes.map(&'[multiples][1]')
-    ).to eq([3, 6, 9, 12, 15])
+      response.then(&'[results]*([weights][0]*.succ)')
+    ).to eq([[1, 2, 3], [4, 5, 6]])
   end
 end

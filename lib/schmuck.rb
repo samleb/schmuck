@@ -1,5 +1,5 @@
 require 'schmuck/version'
-require 'schmuck/lexer'
+require 'schmuck/parser'
 require 'schmuck/path'
 
 module Schmuck
