@@ -9,6 +9,8 @@ RSpec.describe Schmuck::Parser do
   describe "single accessors" do
     {
       ".foo"    => [:method,   "foo"],
+      '."any?"' => [:method,   "any?"],
+      ".'any?'" => [:method,   "any?"],
       "[:foo]"  => [:symbol,   :foo],
       "['foo']" => [:string,   "foo"],
       '["foo"]' => [:string,   "foo"],
@@ -34,6 +36,18 @@ RSpec.describe Schmuck::Parser do
         agg(acc(:method, "b"), optional: true),
       ]
     end
+  end
+
+  context "with ? after an unquoted method name" do
+    let(:source) { ".any?.b" }
+
+    it { is_expected.to eq [acc(:method, "any"), acc(:method, "b", optional: true)] }
+  end
+
+  context "with a quoted method name after an aggregate" do
+    let(:source) { '[results]*[details]."any?"' }
+
+    it { is_expected.to eq [acc(:property, "results"), agg(acc(:property, "details")), acc(:method, "any?")] }
   end
 
   context "with a chain" do
@@ -93,6 +107,8 @@ RSpec.describe Schmuck::Parser do
       "*()"      => "expected '.', '[' or '*'",
       "*(.a"     => "expected '.', '[' or '*'",
       "??.a"     => "expected '.', '[' or '*'",
+      '."any?'   => 'expected "\""',
+      ".''"      => "expected identifier",
       "*(*(.a)"  => "expected '.', '[' or '*'",   # unclosed inner group
     }.each do |src, message|
       context "with #{src.inspect}" do

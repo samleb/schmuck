@@ -37,26 +37,33 @@ module Schmuck
       expressions
     end
 
-    # accessor := '.' word | '[' bracket ']'
+    # accessor := '.' ( quoted | word ) | '[' bracket ']'
     def accessor(optional)
       type, key =
-        if    @s.skip(".") then [:method, word]
+        if    @s.skip(".") then [:method, quoted || word]
         elsif @s.skip("[") then bracket.tap { expect("]") }
         else  raise error("expected '.', '[' or '*'")
         end
       Accessor.new(type, key, optional)
     end
 
-    # bracket := ':' word | quote word quote | digits | word
+    # bracket := ':' word | quoted | digits | word
     def bracket
       if @s.skip(":")                       then [:symbol, word.to_sym]
-      elsif (quote = @s.scan(/['"]/))       then [:string, word.tap { expect(quote) }]
+      elsif (string = quoted)               then [:string, string]
       elsif (digits = @s.scan(/\d+(?=\])/)) then [:index, Integer(digits)]
       else                                       [:property, word]
       end
     end
 
     def word = @s.scan(/\w+/) || raise(error("expected identifier"))
+
+    # quoted := "'" [^']+ "'" | '"' [^"]+ '"'
+    def quoted
+      return unless (quote = @s.scan(/['"]/))
+
+      (@s.scan(/[^#{quote}]+/) || raise(error("expected identifier"))).tap { expect(quote) }
+    end
 
     def expect(str) = @s.skip(str) || raise(error("expected #{str.inspect}"))
 

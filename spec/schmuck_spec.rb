@@ -44,4 +44,9 @@ RSpec.describe Schmuck do
     expect { { a: nil }.then(&'[a].b') }.to raise_error(NoMethodError)
     expect { { a: nil }.then(&'[a]*.b') }.to raise_error(ArgumentError, "object isn't optional")
   end
+
+  it "calls quoted method names" do
+    response = { results: [{ details: [1] }, { details: [] }] }
+    expect(response.then(&'[results]*([details]."any?")')).to eq([true, false])
+  end
 end
