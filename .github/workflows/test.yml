@@ -1,6 +1,9 @@
 name: Test
 
-on: pull_request
+on:
+  push:
+    branches: [master]
+  pull_request:
 
 permissions:
   contents: read

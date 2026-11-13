@@ -1,5 +1,7 @@
 # Schmuck
 
+[![Test](https://github.com/samleb/schmuck/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/samleb/schmuck/actions/workflows/test.yml?query=branch%3Amaster)
+
 Readable paths through nested hashes and arrays, usable as blocks.
 
 ## Installation
