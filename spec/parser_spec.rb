@@ -1,5 +1,3 @@
-require_relative "spec_helper"
-
 RSpec.describe Schmuck::Parser do
   def acc(type, key, optional: false) = described_class::Accessor.new(type, key, optional)
   def agg(*accessors, optional: false) = described_class::Aggregate.new(accessors, optional)

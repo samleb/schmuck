@@ -1,4 +1,3 @@
-require "spec_helper"
 require "json"
 
 RSpec.describe Schmuck do

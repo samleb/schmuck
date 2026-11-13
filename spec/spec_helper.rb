@@ -1,4 +1,3 @@
-require "bundler/setup"
 require "schmuck"
 
 RSpec.configure do |config|
