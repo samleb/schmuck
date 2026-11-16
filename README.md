@@ -29,16 +29,15 @@ pull_requests.map(&'[user][login]')
 
 | Syntax                  | Meaning                                              | Ruby                          |
 |-------------------------|------------------------------------------------------|-------------------------------|
-| `.name`                 | method call                                          | `object.name`                 |
-| `."any?"`, `.'any?'`    | method whose name needs quoting (`?`, `!`, …)        | `object.any?`                 |
+| `.name`, `.any?`        | method call                                          | `object.name`, `object.any?`  |
 | `[name]`                | hash key, as a string, then as a symbol              | `hash["name"]`, `hash[:name]` |
 | `["a key"]`, `['a key']`| string key, any characters                           | `hash["a key"]`               |
 | `[:name]`               | symbol key                                           | `hash[:name]`                 |
 | `[0]`                   | index                                                | `array[0]`                    |
 | `*x`, `*(x y …)`        | map the next accessor (or group) over each element   | `array.map { … }`             |
-| `?x`                    | skip the accessor when its receiver is `nil`         | `&.`                          |
+| `&x`                    | skip the accessor when its receiver is `nil`         | `&.`                          |
 
-Without `?`, an accessor called on `nil` raises, just like plain Ruby. `*`
+Without `&`, an accessor called on `nil` raises, just like plain Ruby. `*`
 applies to the next accessor only, so `*[a][b]` maps `[a]` and then calls
 `[b]` on the resulting array: use `*([a][b])` to apply both to each element.
 
@@ -118,8 +117,8 @@ Schmuck:
 ```ruby
 pull_requests.map(&'[user][login]')            # => ["octocat", "hubot"]
 pull_requests.map(&'[labels]*[name]')          # => [["enhancement", "parser"], []]
-pull_requests.then(&'*[draft]."any?"')         # => true
-pull_requests.map(&'[head][repo]?[full_name]') # => ["octocat/schmuck", nil]
+pull_requests.then(&'*[draft].any?')           # => true
+pull_requests.map(&'[head][repo]&[full_name]') # => ["octocat/schmuck", nil]
 ```
 
 ### A deeply nested GraphQL response
@@ -187,14 +186,14 @@ the best-known JSON query languages:
   parse again, and no native library to install (Ruby gems for jq wrap its C
   library).
 - **Any Ruby method can appear in a path.** `.flatten.uniq`, `.sum` or
-  `."any?"` replace the fixed set of functions that query languages provide.
+  `.any?` replace the fixed set of functions that query languages provide.
 - **Nested arrays keep their structure** until you call `.flatten`, while jq,
   JSONPath and JSONata flatten results automatically.
 - **It's strict by default.** Accessing anything on `nil` raises unless you
-  write `?`, where query languages usually return nothing.
+  write `&`, where query languages usually return nothing.
 - **The syntax feels familiar.** It extends Ruby's `Symbol#to_proc`
-  (`map(&:name)`) to strings, and borrows Groovy's spread operator (`*.`) and
-  JavaScript's optional chaining (`?.`).
+  (`map(&:name)`) to strings, reuses Ruby's safe navigation (`&.`), and borrows
+  Groovy's spread operator (`*.`).
 
 The trade-off is that a path is a string parsed at runtime (and cached), so a
 mistake in it only shows up when that code runs, and editors can't check or

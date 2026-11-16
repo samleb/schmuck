@@ -71,12 +71,12 @@ RSpec.describe Schmuck do
     end
 
     it "calls predicate methods" do
-      expect(pull_requests.then(&'*[draft]."any?"')).to be(true)
-      expect(pull_requests.then(&'*([labels]."empty?")')).to eq([false, true])
+      expect(pull_requests.then(&'*[draft].any?')).to be(true)
+      expect(pull_requests.then(&'*([labels].empty?)')).to eq([false, true])
     end
 
     it "skips null values with optional accessors" do
-      expect(pull_requests.then(&'*([head][repo]?[full_name])')).to eq(["octocat/schmuck", nil])
+      expect(pull_requests.then(&'*([head][repo]&[full_name])')).to eq(["octocat/schmuck", nil])
     end
   end
 
@@ -119,7 +119,7 @@ RSpec.describe Schmuck do
   end
 
   it "fails on nil unless the accessor is optional" do
-    expect({ a: nil }.then(&'[a]?.b')).to be_nil
+    expect({ a: nil }.then(&'[a]&.b')).to be_nil
     expect { { a: nil }.then(&'[a].b') }.to raise_error(NoMethodError)
     expect { { a: nil }.then(&'[a]*.b') }.to raise_error(ArgumentError, "object isn't optional")
   end

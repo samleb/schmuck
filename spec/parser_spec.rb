@@ -9,8 +9,8 @@ RSpec.describe Schmuck::Parser do
   describe "single accessors" do
     {
       ".foo"    => [:method,   "foo"],
-      '."any?"' => [:method,   "any?"],
-      ".'any?'" => [:method,   "any?"],
+      ".any?"   => [:method,   "any?"],
+      ".save!"  => [:method,   "save!"],
       "[:foo]"  => [:symbol,   :foo],
       "['foo']" => [:string,   "foo"],
       '["foo"]' => [:string,   "foo"],
@@ -26,8 +26,8 @@ RSpec.describe Schmuck::Parser do
     end
   end
 
-  context "with ? in front of any accessor" do
-    let(:source) { "?.a?[0]?*.b" }
+  context "with & in front of any accessor" do
+    let(:source) { "&.a&[0]&*.b" }
 
     it do
       is_expected.to eq [
@@ -38,14 +38,14 @@ RSpec.describe Schmuck::Parser do
     end
   end
 
-  context "with ? after an unquoted method name" do
-    let(:source) { ".any?.b" }
+  context "with & after a predicate method name" do
+    let(:source) { ".any?&.b" }
 
-    it { is_expected.to eq [acc(:method, "any"), acc(:method, "b", optional: true)] }
+    it { is_expected.to eq [acc(:method, "any?"), acc(:method, "b", optional: true)] }
   end
 
-  context "with a quoted method name after an aggregate" do
-    let(:source) { '[results]*[details]."any?"' }
+  context "with a predicate method name after an aggregate" do
+    let(:source) { "[results]*[details].any?" }
 
     it { is_expected.to eq [acc(:property, "results"), agg(acc(:property, "details")), acc(:method, "any?")] }
   end
@@ -63,7 +63,7 @@ RSpec.describe Schmuck::Parser do
   end
 
   context "with a grouped aggregate" do
-    let(:source) { "*(.address?[:city])[0]" }
+    let(:source) { "*(.address&[:city])[0]" }
 
     it do
       is_expected.to eq [
@@ -106,9 +106,9 @@ RSpec.describe Schmuck::Parser do
       "['foo\"]" => %q(expected "'"),
       "*()"      => "expected '.', '[' or '*'",
       "*(.a"     => "expected '.', '[' or '*'",
-      "??.a"     => "expected '.', '[' or '*'",
-      '."any?'   => 'expected "\""',
-      ".''"      => "expected identifier",
+      "&&.a"     => "expected '.', '[' or '*'",
+      '."any?"'  => "expected identifier",
+      ".any??"   => "expected '.', '[' or '*'",
       "*(*(.a)"  => "expected '.', '[' or '*'",   # unclosed inner group
     }.each do |src, message|
       context "with #{src.inspect}" do

@@ -24,9 +24,9 @@ module Schmuck
 
     private
 
-    # expression := '?'? ( '*' aggregated | accessor )
+    # expression := '&'? ( '*' aggregated | accessor )
     def expression
-      optional = !@s.skip("?").nil?
+      optional = !@s.skip("&").nil?
       @s.skip("*") ? Aggregate.new(aggregated, optional) : accessor(optional)
     end
 
@@ -39,10 +39,10 @@ module Schmuck
       expressions
     end
 
-    # accessor := '.' ( quoted | word ) | '[' bracket ']'
+    # accessor := '.' word [?!]? | '[' bracket ']'
     def accessor(optional)
       type, key =
-        if    @s.skip(".") then [:method, quoted || word]
+        if    @s.skip(".") then [:method, word(/\w+[?!]?/)]
         elsif @s.skip("[") then bracket.tap { expect("]") }
         else  raise error("expected '.', '[' or '*'")
         end
@@ -58,7 +58,7 @@ module Schmuck
       end
     end
 
-    def word = @s.scan(/\w+/) || raise(error("expected identifier"))
+    def word(pattern = /\w+/) = @s.scan(pattern) || raise(error("expected identifier"))
 
     # quoted := "'" [^']+ "'" | '"' [^"]+ '"'
     def quoted
